@@ -2,6 +2,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useOptimistic,
   useSyncExternalStore,
 } from "react";
 
@@ -79,11 +80,26 @@ export function TodoStoreProvider({ children }: { children: ReactNode }) {
     todoStore.getSnapshot,
   );
 
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (state, task: string) => {
+      return [
+        ...state,
+        { id: nextIdPtr, text: task, completed: false, isPending: true },
+      ];
+    },
+  );
+
+  const addTodo = async (task: string) => {
+    addOptimisticTodo(task);
+    await todoStore.addTodo(task);
+  };
+
   return (
     <TodoStoreContext.Provider
       value={{
-        todos: todos,
-        addTodo: todoStore.addTodo,
+        todos: optimisticTodos,
+        addTodo: addTodo,
         toggleTodo: todoStore.toggleTodo,
         deleteTodo: todoStore.deleteTodo,
       }}
