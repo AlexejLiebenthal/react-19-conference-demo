@@ -9,6 +9,12 @@ import "./index.css";
 const rootElement = document.querySelector("#root")!;
 
 createRoot(rootElement, {
+  onCaughtError: (error, errInfo) => {
+    console.error(error, errInfo);
+  },
+  onUncaughtError: (error, errInfo) => {
+    console.error(error, errInfo);
+  },
   onRecoverableError: (error, errInfo) => {
     console.error(error, errInfo);
   },
