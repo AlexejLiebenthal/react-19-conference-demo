@@ -1,7 +1,7 @@
 import {
   createContext,
   type ReactNode,
-  useContext,
+  use,
   useOptimistic,
   useSyncExternalStore,
 } from "react";
@@ -96,7 +96,7 @@ export function TodoStoreProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <TodoStoreContext.Provider
+    <TodoStoreContext
       value={{
         todos: optimisticTodos,
         addTodo: addTodo,
@@ -105,13 +105,13 @@ export function TodoStoreProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </TodoStoreContext.Provider>
+    </TodoStoreContext>
   );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useTodoStore = () => {
-  const context = useContext(TodoStoreContext);
+  const context = use(TodoStoreContext);
   if (!context) {
     throw new Error("useTodosStore must be used within an TodoStoreProvider");
   }
