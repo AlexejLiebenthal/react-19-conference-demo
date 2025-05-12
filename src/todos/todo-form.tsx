@@ -1,36 +1,30 @@
-import { useState, type ComponentProps } from "react";
+import { useActionState, type ComponentProps } from "react";
 
 import { useTodoStore } from "./todo-store";
 
 export function TodoForm() {
   const { addTodo } = useTodoStore();
-  const [error, setError] = useState<string>();
-  const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setIsPending(true);
-    setError(undefined);
-
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const task = formData.get("task");
-    if (typeof task !== "string") {
-      return { error: "input[name] task is not defined" };
-    }
-    try {
-      await addTodo(task);
-      form.reset();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : JSON.stringify(error));
-    } finally {
-      setIsPending(false);
-    }
-  };
+  const [{ error }, formAction, isPending] = useActionState(
+    async (_previousState: unknown, formData: FormData) => {
+      const task = formData.get("task");
+      if (typeof task !== "string") {
+        return { error: "input[name] task is not defined" };
+      }
+      try {
+        await addTodo(task);
+        return { error: undefined };
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error.message : JSON.stringify(error),
+        };
+      }
+    },
+    { error: undefined },
+  );
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form action={formAction} className="flex flex-col">
       <div className="join">
         <Input
           ref={(input) => {
