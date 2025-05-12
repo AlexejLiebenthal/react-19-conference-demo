@@ -1,57 +1,15 @@
-import { useEffect, useState } from "react";
+import { use } from "react";
 
-import { fetchCharacter, type Character } from "./fetch-character";
+import { type Character } from "./fetch-character";
 
-export function Character({ id, next }: { id: number; next: () => void }) {
-  const [character, setCharacter] = useState<Character>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error>();
-
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-    setError(undefined);
-    setCharacter(undefined);
-
-    const fetch = () => {
-      fetchCharacter(id)
-        .then((character) => {
-          if (isMounted) {
-            setCharacter(character);
-            setIsLoading(false);
-          }
-        })
-        .catch((error: unknown) => {
-          if (isMounted) {
-            setError(
-              error instanceof Error ? error : new Error("Unknown error"),
-            );
-            setIsLoading(false);
-          }
-        });
-    };
-
-    fetch();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center gap-2">
-        Loading Character
-        <span className="loading loading-bars" />
-      </div>
-    );
-  }
-
-  if (error || !character) {
-    return (
-      <div className="text-error">Error: {error?.message ?? "No data"}</div>
-    );
-  }
+export function Character({
+  fetchCharacterPromise,
+  next,
+}: {
+  fetchCharacterPromise: Promise<Character>;
+  next: () => void;
+}) {
+  const character = use(fetchCharacterPromise);
 
   return (
     <div className="card card-side bg-base-200 mx-auto h-64 w-xl shadow-lg">
