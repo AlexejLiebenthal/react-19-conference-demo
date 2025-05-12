@@ -1,4 +1,4 @@
-import { forwardRef, useState, type ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 
 import { useTodoStore } from "./todo-store";
 
@@ -62,8 +62,7 @@ export function TodoForm() {
   );
 }
 
-const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
+function Input(props: ComponentProps<"input">) {
   // eslint-disable-next-line react/jsx-props-no-spreading
-  (props, ref) => <input ref={ref} {...props} />,
-);
-Input.displayName = "Input";
+  return <input {...props} />;
+}
